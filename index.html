@@ -726,7 +726,7 @@ function bandHTML(p){
   if (p.isExample) who.push('예시 데이터');
   return `<div class="s-band">
     <div class="s-eyebrow">${esc(S.study)}</div>
-    <div class="s-title"><b>성인(만 19~64세)</b> 영양지수 <b>결과지</b></div>
+    <div class="s-title"><b>영양지수 결과지</b></div>
     <div class="s-who">${p.name ? `<strong>${esc(p.name)} 님</strong>` : ''}${who.join(' · ')}</div>
     ${ch ? `<img class="s-calf" src="${esc(ch)}" alt="">` : ''}
   </div>`;
