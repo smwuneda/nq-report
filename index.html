@@ -100,6 +100,26 @@ table.people tbody tr.cur{background:var(--accent-soft)}
 .live-status.on{color:var(--ink)}
 .check{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--muted)}
 .live summary{cursor:pointer;font-size:12.5px;color:var(--accent);font-weight:500}
+.excel{margin-top:2px}
+.excel summary{cursor:pointer;font-size:12.5px;color:var(--muted)}
+.excel[open] summary{margin-bottom:8px}
+/* 접속 키 화면 */
+.topbar .lockbtn{margin-left:auto;align-self:center}
+#lock{display:none;justify-content:center;align-items:flex-start;padding:56px 16px}
+body.locked #lock{display:flex}
+body.locked .app, body.locked #lockBtn{display:none}
+body.viewer #lock{display:none}
+.lock-box{width:100%;max-width:360px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px 24px;
+  text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.lock-box img{width:60px;height:60px;object-fit:contain}
+.lock-box h2{margin:0;font-size:18px}
+.lock-box p{margin:0}
+.lock-form{display:flex;gap:8px;width:100%}
+.lock-form input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);
+  font-size:16px;letter-spacing:4px;text-align:center}
+.lock-form input::placeholder{letter-spacing:normal}
+#lockMsg{min-height:1.5em}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);font-size:12.5px;text-decoration:underline;cursor:pointer}
 .form-row input[type=password]{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
 .search{width:100%;margin-top:10px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
 .chip.ok{background:#e3f4e8;color:#1d7a3b}
@@ -229,30 +249,43 @@ body.viewer #viewer{display:block}
 <header class="topbar">
   <h1>영양지수 결과지 만들기</h1>
   <span id="topLab">숙명여자대학교 식품영양학과 영양역학 및 정보분석 연구실</span>
+  <button class="btn small lockbtn" id="lockBtn" type="button" hidden>잠그기</button>
 </header>
+
+<section id="lock" aria-label="접속 키 입력">
+  <div class="lock-box">
+    <img id="lockLogo" alt="" hidden>
+    <h2>영양지수 결과지 만들기</h2>
+    <p class="hint">연구실 접속 키를 넣고 들어가세요.</p>
+    <form class="lock-form" id="lockForm" autocomplete="off">
+      <input type="password" id="lockKey" inputmode="numeric" aria-label="접속 키" placeholder="접속 키">
+      <button class="btn primary" id="lockGo" type="submit">들어가기</button>
+    </form>
+    <p id="lockMsg" class="live-status" role="status"></p>
+    <button class="linkbtn" id="lockExcel" type="button">연결이 안 될 때: 엑셀 파일로 쓰기</button>
+  </div>
+</section>
 
 <main class="app">
   <section class="side">
     <div class="card">
       <h2><span class="n">1</span>응답 불러오기</h2>
       <div class="live">
-        <div class="live-row"><span id="liveStatus" class="live-status"></span><button class="btn primary small" id="liveRefresh" type="button" hidden>새로고침</button></div>
+        <div class="live-row"><span id="liveStatus" class="live-status"></span><button class="btn primary small" id="liveRefresh" type="button" hidden>새로고침</button><button class="btn primary small" id="liveLogin" type="button" hidden>접속 키 넣기</button></div>
         <label class="check" for="liveAuto"><input type="checkbox" id="liveAuto"> 1분마다 자동으로 새로고침</label>
-        <details id="liveSetup"><summary>구글 시트 연결 설정</summary>
+        <details id="liveSetup"><summary>연결 주소 바꾸기</summary>
           <div class="form-row"><label for="liveUrl">웹 앱 주소</label><input type="text" id="liveUrl" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></div>
-          <div class="form-row"><label for="liveKey">접속 키</label><input type="password" id="liveKey" autocomplete="off"></div>
-          <div class="btns"><button class="btn small" id="liveSave" type="button">저장하고 연결</button><button class="btn small" id="liveClear" type="button">연결 끊기</button></div>
-          <p class="hint">응답 시트에 연결 스크립트를 붙이고 웹 앱으로 배포하면 나오는 주소와 키를 넣으세요. 이 브라우저에만 저장돼요.</p>
+          <div class="btns"><button class="btn small" id="liveSave" type="button">저장하고 다시 연결</button><button class="btn small" id="liveClear" type="button">처음 주소로</button></div>
+          <p class="hint">Apps Script에서 ‘새 배포’를 해서 웹 앱 주소가 바뀌었을 때만 넣으세요. 이 브라우저에만 저장돼요.</p>
         </details>
       </div>
-      <p class="hint" style="margin:0 0 8px">또는 응답 엑셀을 직접 올려도 돼요.</p>
-      <label class="drop" id="drop" for="fileInput">
-        <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" multiple>
-        <strong>엑셀 파일을 끌어다 놓거나 눌러서 고르세요</strong>
-        <span class="hint">.xlsx · .csv · 여러 개 한 번에 가능</span>
-      </label>
-      <p class="hint">영양지수 구글폼 응답 시트 → 파일 → 다운로드 → Microsoft Excel(.xlsx). 영양지수 응답만 읽어요.</p>
-      <p class="hint">파일은 이 브라우저 안에서만 읽고, 어디로도 보내지 않아요.</p>
+      <details class="excel" id="excelBox"><summary>연결이 안 될 때: 엑셀 파일로 올리기</summary>
+        <label class="drop" id="drop" for="fileInput">
+          <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" multiple>
+          <strong>엑셀 파일을 끌어다 놓거나 눌러서 고르세요</strong>
+          <span class="hint">구글폼 응답 시트 → 파일 → 다운로드 → Microsoft Excel(.xlsx)</span>
+        </label>
+      </details>
       <ul class="files" id="fileList"></ul>
       <div id="loadMsg"></div>
     </div>
@@ -270,7 +303,7 @@ body.viewer #viewer{display:block}
           <tbody id="peopleBody"></tbody>
         </table>
       </div>
-      <p class="hint">가장 최근에 제출한 사람이 맨 위에 와요. 방금 설문을 끝낸 대상자가 안 보이면 구글폼 응답 엑셀을 다시 내려받아 올리세요(같은 폼 파일은 새 파일로 바뀌어요). 줄을 누르면 오른쪽에 결과지가 보여요.</p>
+      <p class="hint">가장 최근에 제출한 사람이 맨 위에 와요. 방금 설문을 끝낸 대상자가 안 보이면 위의 새로고침을 누르세요. 줄을 누르면 오른쪽에 결과지가 보여요.</p>
     </div>
 
     <div class="card">
@@ -692,7 +725,12 @@ function rebuild(){
   people.sort((a, b) => (b.ts - a.ts) || (a.id && b.id ? a.id.localeCompare(b.id, 'ko', {numeric:true}) : 0) || (a.fileIdx - b.fileIdx) || (a.row - b.row));
   people.forEach((p, i) => p.label = p.id || p.name || p.initials || `응답 ${i + 1}`);
   state.people = people;
-  state.selected = new Set(people.filter(p => p.ok).map(p => p.key));
+  // 새로고침해서 새 응답이 들어오면 그 사람(가장 최근 제출)을 바로 미리보기에 띄운다
+  const seen = state.seen || new Set(), fresh = people.filter(p => !seen.has(p.key));
+  state.seen = new Set(people.map(p => p.key));
+  if (state.files.every(f => f.isExample)) state.selected = new Set(people.filter(p => p.ok).map(p => p.key));
+  else state.selected = new Set([...state.selected].filter(k => people.some(p => p.key === k && p.ok))); // 실제 응답은 고른 사람만
+  if (fresh.length) state.current = (fresh.find(p => p.ok) || fresh[0]).key;
   if (!people.find(p => p.key === state.current)) state.current = (people.find(p => p.ok) || people[0] || {}).key || null;
   renderAll();
 }
@@ -877,7 +915,7 @@ const $ = s => document.querySelector(s);
 function gChip(g){ return `<span class="g ${GRADE[g].cls}">${g}</span>`; }
 function renderAll(){ renderFiles(); renderPeople(); renderMap(); renderPreview(); }
 function renderFiles(){
-  $('#fileList').innerHTML = state.files.map((f, i) => `<li><span title="${esc(f.name)}">${esc(f.name)}</span><em>${f.isExample ? '예시' : '영양지수'} · ${dataRows(f).length}줄</em>${f.isExample ? '' : `<button class="btn small" type="button" data-rm="${i}">빼기</button>`}</li>`).join('');
+  $('#fileList').innerHTML = state.files.map((f, i) => (f.isExample || f.name.startsWith('구글 시트 · ')) ? '' : `<li><span title="${esc(f.name)}">${esc(f.name)}</span><em>${f.isExample ? '예시' : '영양지수'} · ${dataRows(f).length}줄</em>${f.isExample ? '' : `<button class="btn small" type="button" data-rm="${i}">빼기</button>`}</li>`).join('');
 }
 function renderPeople(){
   const P = state.people, ok = P.filter(p => p.ok).length;
@@ -904,7 +942,7 @@ function renderPeople(){
       <td><input type="checkbox" data-sel="${esc(p.key)}" ${state.selected.has(p.key) ? 'checked' : ''} ${p.ok ? '' : 'disabled'} aria-label="${esc(p.label)} 선택"></td>
       <td>${esc(p.label)}${p.name && p.name !== p.label ? `<small>${esc(p.name)}</small>` : ''}${extra ? '<br>' + extra : ''}</td>
       <td>${esc(when)}</td><td>${st}</td><td>${p.ok ? `${f1(p.s.T)}${gChip(p.g.T)}` : '–'}</td></tr>`;
-  }).join('') || `<tr><td colspan="5" style="color:var(--muted);cursor:default">${q ? '찾는 대상자가 없어요. 최신 응답 엑셀을 다시 올려 보세요.' : '영양지수 응답을 찾지 못했어요.'}</td></tr>`;
+  }).join('') || `<tr><td colspan="5" style="color:var(--muted);cursor:default">${q ? '찾는 대상자가 없어요. 새로고침을 눌러 보세요.' : state.link ? '아직 들어온 응답이 없어요. 대상자가 설문을 제출하면 새로고침을 눌러 주세요.' : '영양지수 응답을 찾지 못했어요.'}</td></tr>`;
   const selAll = $('#selAll'), okKeys = P.filter(p => p.ok).map(p => p.key);
   selAll.checked = okKeys.length > 0 && okKeys.every(k => state.selected.has(k));
   selAll.indeterminate = !selAll.checked && okKeys.some(k => state.selected.has(k));
@@ -942,7 +980,7 @@ function renderPreview(){
   $('#printOne').disabled = !(p && p.ok);
   $('#copyLink').disabled = !(p && p.ok);
   $('#linkBox').hidden = true;
-  if (!p){ $('#pvTitle').textContent = '미리보기'; $('#pages').innerHTML = '<div class="empty">구글폼 응답 엑셀을 올리면 결과지가 여기에 보여요.</div>'; return; }
+  if (!p){ $('#pvTitle').textContent = '미리보기'; $('#pages').innerHTML = `<div class="empty">${state.link ? '아직 들어온 응답이 없어요. 대상자가 설문을 제출하면 왼쪽에서 새로고침을 눌러 주세요.' : '구글폼 응답 엑셀을 올리면 결과지가 여기에 보여요.'}</div>`; return; }
   $('#pvTitle').textContent = `미리보기 · ${p.label}${p.sex ? ` (${p.sex})` : ''}`;
   if (!p.ok){
     const lines = [];
@@ -1048,44 +1086,97 @@ function exampleFile(){
 }
 
 /* ---------- 구글 시트 연결 (Apps Script 웹 앱) ---------- */
-const LINK_KEY = 'nqReport.link.v1';
-function loadLink(){ try { return JSON.parse(localStorage.getItem(LINK_KEY) || 'null'); } catch (e){ return null; } }
-function saveLink(v){ try { if (v) localStorage.setItem(LINK_KEY, JSON.stringify(v)); else localStorage.removeItem(LINK_KEY); } catch (e){ /* 저장 안 돼도 지금 화면에서는 연결됨 */ } }
+// 연구실 영양지수 응답 시트 웹 앱 (smwu.neda.lab 계정에서 배포).
+// 주소만으로는 응답을 못 보고, 접속 키가 맞아야 응답을 보내 줘요. 키는 이 파일에 넣지 않고 사람이 직접 넣어요.
+const LIVE_URL = 'https://script.google.com/macros/s/AKfycbyeVhQ5SJO5EmHdIa8xVtiUzuLMil053k30uDbwcQHQhoQkqKaEdbvhJKb-TvsRwu9X/exec';
+const LINK_KEY = 'nqReport.link.v2', URL_KEY = 'nqReport.url.v1';
+function stored(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e){ return null; } }
+function store(k, v){ try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e){ /* 저장 안 돼도 지금 화면에서는 연결됨 */ } }
+function liveUrl(){ const u = stored(URL_KEY); return typeof u === 'string' && u ? u : LIVE_URL; }
+function loadLink(){ const v = stored(LINK_KEY); return v && v.key ? {url:liveUrl(), key:String(v.key), auto:!!v.auto} : null; }
+function saveLink(v){ store(LINK_KEY, v ? {key:v.key, auto:!!v.auto} : null); }
 let liveTimer = null, liveBusy = false;
 function setLive(msg, kind){ const el = $('#liveStatus'); el.textContent = msg; el.className = 'live-status' + (kind ? ' ' + kind : ''); }
+function lockSay(msg, kind){ const el = $('#lockMsg'); el.textContent = msg || ''; el.className = 'live-status' + (kind ? ' ' + kind : ''); }
 const hms = d => [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => String(n).padStart(2, '0')).join(':');
+// 결과: 'ok' 불러옴 · 'key' 접속 키 틀림 · 'fail' 연결 안 됨 · 'busy' 이미 불러오는 중
 async function liveFetch(){
-  const L = state.link; if (!L || !L.url || !L.key || liveBusy) return;
+  const L = state.link; if (!L || !L.url || liveBusy) return 'busy';
   liveBusy = true; setLive('불러오는 중…');
   try {
-    const u = L.url + (L.url.includes('?') ? '&' : '?') + 'key=' + encodeURIComponent(L.key) + '&t=' + Date.now();
+    const u = L.url + (L.url.includes('?') ? '&' : '?') + 'key=' + encodeURIComponent(L.key || '') + '&t=' + Date.now();
     const res = await fetch(u, {cache:'no-store', redirect:'follow'});
     const j = await res.json();
-    if (!j.ok){ setLive(j.error === 'key' ? '접속 키가 맞지 않아요. 연결 설정에서 키를 확인해 주세요.' : '시트를 읽지 못했어요.', 'bad'); return; }
+    if (!j.ok){
+      setLive(j.error === 'key' ? '접속 키가 맞지 않아요.' : '시트를 읽지 못했어요.', 'bad');
+      return j.error === 'key' ? 'key' : 'fail';
+    }
     ingest([{name:`구글 시트 · ${j.name || '영양지수 응답'}`, sheets:[{name:j.sheet || '응답', rows:j.rows || []}]}]);
     setLive(`연결됨 · ${hms(new Date())} 새로고침 · 응답 ${Math.max(0, (j.rows || []).length - 1)}건`, 'on');
+    return 'ok';
   } catch (e){
-    setLive('연결하지 못했어요. 웹 앱 주소와 배포 설정(액세스 권한: 모든 사용자)을 확인해 주세요.', 'bad');
+    setLive('연결하지 못했어요. 인터넷 연결을 확인하고 새로고침을 다시 눌러 주세요.', 'bad');
+    return 'fail';
   } finally { liveBusy = false; }
+}
+async function refresh(){
+  const r = await liveFetch();
+  if (r === 'key') lockOut('접속 키가 바뀌었어요. 새 키를 넣어 주세요.');
+  return r;
+}
+function setLocked(on, msg){
+  document.body.classList.toggle('locked', on);
+  lockSay(msg, msg ? 'bad' : '');
+  if (on){ $('#lockKey').value = ''; if (!document.body.classList.contains('viewer')) setTimeout(() => $('#lockKey').focus(), 0); }
+}
+// 잠그기: 저장된 키를 지우고, 화면에 불러온 응답도 지운다
+function lockOut(msg){
+  state.link = null; saveLink(null);
+  state.files = [exampleFile()]; rebuild();
+  showMsg('info', '지금은 예시 3명이 보여요. 접속 키를 넣으면 실제 응답으로 바뀌어요.');
+  syncLiveUI(); setLocked(true, msg);
 }
 function syncLiveUI(){
   const L = state.link;
-  $('#liveRefresh').hidden = !L;
-  $('#liveUrl').value = (L && L.url) || ''; $('#liveKey').value = (L && L.key) || '';
+  $('#liveRefresh').hidden = !L; $('#liveLogin').hidden = !!L; $('#lockBtn').hidden = !L; $('#liveSetup').hidden = !L;
+  $('#liveUrl').value = liveUrl();
   $('#liveAuto').checked = !!(L && L.auto); $('#liveAuto').disabled = !L;
+  $('#liveAuto').parentElement.hidden = !L;
   clearInterval(liveTimer); liveTimer = null;
-  if (L && L.auto) liveTimer = setInterval(liveFetch, 60000);
-  if (!L){ setLive('구글 시트가 아직 연결되지 않았어요. 아래 연결 설정을 한 번만 해 두면 새로고침으로 바로 불러와요.'); $('#liveSetup').open = false; }
+  if (L && L.auto) liveTimer = setInterval(refresh, 60000);
+  if (!L) setLive('구글 시트에 연결되지 않았어요.');
 }
 function bindLive(){
-  $('#liveSave').addEventListener('click', () => {
-    const url = $('#liveUrl').value.trim(), key = $('#liveKey').value.trim();
-    if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)){ setLive('웹 앱 주소는 https://script.google.com/macros/s/…/exec 모양이에요.', 'bad'); return; }
-    if (!key){ setLive('접속 키를 넣어 주세요.', 'bad'); return; }
-    state.link = {url, key, auto:!!(state.link && state.link.auto)}; saveLink(state.link); syncLiveUI(); $('#liveSetup').open = false; liveFetch();
+  $('#lockForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const key = $('#lockKey').value.trim();
+    if (!key){ lockSay('접속 키를 넣어 주세요.', 'bad'); return; }
+    const prev = state.link;
+    state.link = {url:liveUrl(), key, auto:!!(prev && prev.auto)};
+    lockSay('확인하는 중…'); $('#lockGo').disabled = true;
+    const r = await liveFetch();
+    $('#lockGo').disabled = false;
+    if (r === 'ok'){ saveLink(state.link); syncLiveUI(); setLocked(false); return; }
+    state.link = prev; syncLiveUI();
+    $('#lockKey').select();
+    lockSay(r === 'key' ? '접속 키가 맞지 않아요. 다시 넣어 주세요.' : '연결하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.', 'bad');
   });
-  $('#liveClear').addEventListener('click', () => { state.link = null; saveLink(null); syncLiveUI(); });
-  $('#liveRefresh').addEventListener('click', liveFetch);
+  $('#lockExcel').addEventListener('click', () => { setLocked(false); $('#excelBox').open = true; });
+  $('#liveLogin').addEventListener('click', () => setLocked(true));
+  $('#lockBtn').addEventListener('click', () => lockOut(''));
+  $('#liveSave').addEventListener('click', () => {
+    const m = $('#liveUrl').value.match(/https:\/\/script\.google(?:usercontent)?\.com\/[^\s'"<>]+/);
+    if (!m){ setLive('웹 앱 주소는 https://script.google.com/macros/s/…/exec 모양이에요.', 'bad'); return; }
+    const url = m[0].replace(/([?&])key=[^&#]*&?/, '$1').replace(/[?&#]+$/, '');
+    store(URL_KEY, url === LIVE_URL ? null : url);
+    if (state.link) state.link.url = url;
+    syncLiveUI(); $('#liveSetup').open = false; refresh();
+  });
+  $('#liveClear').addEventListener('click', () => {
+    store(URL_KEY, null); if (state.link) state.link.url = LIVE_URL;
+    syncLiveUI(); $('#liveSetup').open = false; refresh();
+  });
+  $('#liveRefresh').addEventListener('click', refresh);
   $('#liveAuto').addEventListener('change', e => { if (!state.link) return; state.link.auto = e.target.checked; saveLink(state.link); syncLiveUI(); });
 }
 
@@ -1155,6 +1246,7 @@ function syncBrand(){
   const lt = $('#logoThumb'), ct = $('#charThumb');
   lt.hidden = !logoSrc(); if (logoSrc()) lt.src = logoSrc();
   ct.hidden = !charSrc(); if (charSrc()) ct.src = charSrc();
+  const ll = $('#lockLogo'); ll.hidden = !logoSrc(); if (logoSrc()) ll.src = logoSrc();
 }
 
 state.settings = loadSettings();
@@ -1162,8 +1254,10 @@ state.link = loadLink();
 bind(); bindLive(); syncBrand(); syncLiveUI();
 state.files = [exampleFile()];
 rebuild();
-showMsg('info', '지금 보이는 3명은 예시 데이터예요. 구글폼 응답 엑셀을 올리면 실제 대상자로 바뀌어요.');
-if (!showViewer() && state.link) liveFetch();
+showMsg('info', '지금은 예시 3명이 보여요. 접속 키를 넣으면 실제 응답으로 바뀌어요.');
+const viewing = showViewer();
+setLocked(!state.link);
+if (!viewing && state.link) refresh();
 window.__nq = {state, ITEMS, OPT, matchOption, reportHTML, rebuild, linkFor, personFromHash, ingest, printPeople};
 </script>
 </body>
