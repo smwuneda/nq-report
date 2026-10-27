@@ -361,47 +361,51 @@ const OPT = {
 const ITEMS = [
   {q:1,  d:'B', w:.126, f:'pos5', label:'채소',         hd:h=>/채소/.test(h)},
   {q:2,  d:'B', w:.148, f:'pos5', label:'과일',         hd:h=>/과일/.test(h)&&!/음료|주스/.test(h)},
-  {q:3,  d:'B', w:.068, f:'pos5', label:'우유·유제품',   hd:h=>/우유|유제품/.test(h)&&!/음료/.test(h)},
+  {q:3,  d:'B', w:.068, f:'pos5', label:'우유',   hd:h=>/우유|유제품/.test(h)&&!/음료/.test(h)},
   {q:4,  d:'B', w:.089, f:'pos5', label:'생선',         hd:h=>/생선/.test(h)},
-  {q:5,  d:'B', w:.097, f:'pos5', label:'콩·두부',       hd:h=>/콩|두부/.test(h)},
+  {q:5,  d:'B', w:.097, f:'pos5', label:'콩',       hd:h=>/콩|두부/.test(h)},
   {q:6,  d:'B', w:.146, f:'pos5', label:'견과류',       hd:h=>/견과/.test(h)},
-  {q:7,  d:'B', w:.160, f:'pos5', label:'잡곡',         hd:h=>/잡곡|전곡|통곡/.test(h)},
+  {q:7,  d:'B', w:.160, f:'pos5', label:'전곡',         hd:h=>/잡곡|전곡|통곡/.test(h)},
   {q:8,  d:'M', w:.142, f:'neg5', label:'기름진 빵과자', hd:h=>/빵|과자/.test(h)&&!/패스트|피자|햄버거/.test(h)},
   {q:9,  d:'M', w:.189, f:'neg5', label:'패스트푸드',    hd:h=>/패스트푸드|피자|햄버거|치킨/.test(h)},
   {q:10, d:'M', w:.076, f:'neg5', label:'짠음식',       hd:h=>/국물|라면|찌개|맵고|짠/.test(h)},
   {q:11, d:'M', w:.148, f:'neg5', label:'적색육',       hd:h=>/적색육|붉은고기|소고기|쇠고기|돼지고기/.test(h)&&!/가공/.test(h)},
   {q:12, d:'M', w:.222, f:'neg5', label:'가공육',       hd:h=>/가공육|소시지|소세지|베이컨/.test(h)},
   {q:13, d:'B', w:.166, f:'pos5', label:'아침식사',     hd:h=>/아침/.test(h)},
-  {q:14, d:'M', w:.223, f:'neg6', label:'과식·폭식',    hd:h=>/과식|폭식/.test(h)},
-  {q:15, d:'P', w:.411, f:'pos5', label:'건강한 식생활', hd:h=>(/식생활|식사/.test(h)&&/노력/.test(h))||/건강에좋은식|건강한식생활/.test(h)},
-  {q:16, d:'P', w:.203, f:'pos5', label:'영양표시',     hd:h=>/영양표시|영양성분/.test(h)},
+  {q:14, d:'M', w:.223, f:'neg6', label:'과식',    hd:h=>/과식|폭식/.test(h)},
+  {q:15, d:'P', w:.411, f:'pos5', label:'건강 식생활 노력', hd:h=>(/식생활|식사/.test(h)&&/노력/.test(h))||/건강에좋은식|건강한식생활/.test(h)},
+  {q:16, d:'P', w:.203, f:'pos5', label:'식품표시',     hd:h=>/영양표시|영양성분/.test(h)},
   {q:17, d:'P', w:.179, f:'pos5', label:'손씻기',       hd:h=>/손/.test(h)&&/씻/.test(h)},
   {q:18, d:'P', w:.207, f:'neg6', label:'과음',         hd:h=>/과음|폭음|음주|술/.test(h)},
 ];
 ITEMS.forEach(it => it.opts = OPT[it.q]);
 const NQ_MIN_ITEMS = 12; // 영양지수 문항이 이만큼 보여야 영양지수 엑셀로 본다 (일반사항 등 다른 폼의 비슷한 문항과 섞이지 않게)
 
-// 식품안전나라 성인 영양지수 결과지의 권고 문구
+// 식품안전나라 성인 영양지수 결과지의 권고 문구 (영역 × 판정별)
+// ※ 균형 '중', 절제 '중'·'상', 실천 '상' 문구는 식약처 결과지에서 아직 확인하지 못해 가까운 판정의 문구를 씀
+const B_HIGH = ['매끼니 단백질 식품(육류, 생선, 달걀, 콩류) 섭취하기', '채소 반찬 3종류 이상 섭취하기', '간식으로 과일은 1번 이상, 흰 우유는 2잔 이상 섭취하기'];
+const B_LOW  = ['하루에 단백질 식품(기름기가 적은 고기, 생선, 달걀, 콩류) 4~6회 섭취하기', '식이섬유가 많이 든 과일, 채소, 전곡류 자주 섭취하기', '하루에 우유 1~2잔 섭취하기 (소화가 어려울 시, 유당을 뺀 우유나 두유로 대체)', '하루에 물 6~7회 마시기'];
+const M_ALL  = ['가당음료나 기름진 음식, 패스트푸드, 가공 육류 등의 섭취 줄이기'];
+const P_MID  = ['균형적으로 다양하게 섭취하기', '영양표시 확인', '손 씻기, 규칙적인 운동하기', '술은 금주하며 최대한 절제하기'];
+const P_LOW  = ['균형적으로 다양하게 섭취하기', '영양표시 좀 더 자주 확인하기', '손 씻기, 규칙적인 운동하기', '술은 금주하며 최대한 절제하기'];
 const ADVICE = {
-  B: ['매끼니 단백질 식품(육류, 생선, 달걀, 콩류) 섭취하기',
-      '채소 반찬 3종류 이상 섭취하기',
-      '간식으로 과일은 1번 이상, 흰 우유는 2잔 이상 섭취하기'],
-  M: ['가당음료나 기름진 음식, 패스트푸드, 가공 육류 등의 섭취 줄이기'],
-  P: ['균형적으로 다양하게 섭취하기',
-      '영양표시 확인',
-      '손 씻기, 규칙적인 운동하기',
-      '술은 금주하며 최대한 절제하기'],
+  B: {'상':B_HIGH, '중':B_LOW, '하':B_LOW},
+  M: {'상':M_ALL,  '중':M_ALL, '하':M_ALL},
+  P: {'상':P_MID,  '중':P_MID, '하':P_LOW},
 };
 const MUST = {
-  B: {title:'균형편 이것만은 꼭!', grid:true, items:[['곡류','전곡류 위주로 하루 3~4회'],['고기·생선·달걀·콩류','하루 4~6회'],['채소류','하루 7~9회'],['과일류','하루 2~4회'],['우유·유제품류','하루 1회 이상'],['물','하루 6~7잔']]},
-  M: {title:'절제편 이것만은 꼭!', items:[['','당이 적게 들어 있는 음료 선택하기'],['','패스트푸드 및 빵, 과자류의 포화지방산 함량 확인하기'],['','찌개나 탕류는 싱겁게 조리하고 국물은 적게 먹기'],['','가공육·적색육은 적게 섭취하기'],['','과식 또는 폭식하지 않기']]},
-  P: {title:'실천편 이것만은 꼭!', items:[['','균형 있고 다양하게, 적절하게 먹는 건강한 식생활을 위해 노력하기'],['','영양표시를 확인하여 나에게 적합한 제품 선택하기'],['','질병 및 바이러스 감염 예방을 위해 올바른 손씻기 실천하기'],['','건강을 위해 규칙적으로 적당한 강도의 운동하기'],['','술은 최대한 절제하고, 가능한 금주하기']]},
+  B: {title:'균형편 이것만은 꼭!', items:[['[곡류]','전곡류 위주로 하루 3~4회 섭취'],['[고기·생선·달걀·콩류]','하루 4~6회 섭취'],['[채소류]','하루 7~9회 섭취'],['[과일류]','하루 2~4회 섭취'],['[우유·유제품류]','하루 1회 이상 섭취'],['[물]','하루 6~7잔 섭취']]},
+  M: {title:'절제편 이것만은 꼭!', items:[['','당이 적게 들어 있는 음료 선택하기'],['','패스트푸드 및 빵·과자류의 포화지방산 함량 확인하기'],['','찌개나 탕류는 싱겁게 조리하고 국물은 적게 먹기'],['','가공육·적색육은 적게 섭취하기'],['','과식 또는 폭식하지 않기']]},
+  P: {title:'실천편 이것만은 꼭!', items:[['','균형있고 다양하고 적절하게 먹는 건강한 식생활을 위해 노력하기'],['','영양표시를 확인하여 나에게 적합한 제품 선택하기'],['','질병 및 바이러스 감염 예방을 위해 올바른 손씻기 실천하기'],['','건강을 위해 규칙적으로 적절한 강도의 운동하기'],['','술은 최대한 절제하고, 가능한 금주하기']]},
 };
-// '…' 항목을 개선하세요! 에 넣을 문항 기준 (응답 코드). 식약처 결과지 예시와 같은 결과가 나오도록 맞춘 기준이다.
+// '…' 항목을 개선하세요! 에 넣을 문항 기준 (응답 코드). 식약처 결과지 4건과 모두 같은 결과가 나오도록 맞춘 기준이다.
 const FLAG = {
   pos5: x => x <= 3,            // 균형·실천 문항: '보통' 이하 (예: 손씻기 '보통이다')
-  neg5: x => x >= 4,            // 절제 식품: 일주일에 4~6번 이상 (예: 가공육, 짠음식)
+  neg5: x => x >= 4,            // 절제 식품: 일주일에 4~6번 이상 (짠음식, 가공육)
+  8:    x => x >= 3,            // 기름진 빵과자: 일주일에 1~3번 이상
+  9:    x => x >= 3,            // 패스트푸드: 일주일에 1~3번 이상
   11:   x => x >= 5,            // 적색육: 하루에 1번 이상일 때만
+  13:   x => x <= 4,            // 아침식사: 매일 먹지 않으면 (식약처 결과지: 일주일에 5~6번도 포함)
   14:   x => x >= 4,            // 과식·폭식: 일주일에 1번 이상
   18:   x => x >= 3,            // 과음: 한 달에 1번 정도 이상
 };
@@ -411,13 +415,12 @@ const GRADE = {
   '중': {word:'개선 필요', cls:'mid',  overall:'보통'},
   '상': {word:'양호',      cls:'high', overall:'양호한'},
 };
+// 비만도: 식약처 영양지수 결과지 표기 (BMI 20.7 → 정상, 27.3 → 비만 확인). 23~25 구간 이름은 확인 전이라 '과체중'으로 둠
 const BMI_STEPS = [
-  {name:'저체중',     range:'<18.5',     max:18.5, bg:'#eef1f6', fg:'#2b3a55'},
-  {name:'정상',       range:'18.5–22.9', max:23,   bg:'#d6e2f5', fg:'#173a78'},
-  {name:'비만 전단계', range:'23.0–24.9', max:25,   bg:'#b1c8ee', fg:'#123570'},
-  {name:'1단계 비만',  range:'25.0–29.9', max:30,   bg:'#5b8fdc', fg:'#ffffff'},
-  {name:'2단계 비만',  range:'30.0–34.9', max:35,   bg:'#1f5fc4', fg:'#ffffff'},
-  {name:'3단계 비만',  range:'≥35.0',     max:1e9,  bg:'#0b2f78', fg:'#ffffff'},
+  {name:'저체중', max:18.5},
+  {name:'정상',   max:23},
+  {name:'과체중', max:25},
+  {name:'비만',   max:1e9},
 ];
 
 /* =========================================================
@@ -448,7 +451,7 @@ function scorePerson(p){
 function bmiInfo(h, w){
   if (!h || !w) return null;
   const b = w / Math.pow(h / 100, 2);
-  const step = BMI_STEPS.findIndex(s => r1(b) < s.max); // 대한비만학회 비만 진료지침 2022
+  const step = BMI_STEPS.findIndex(s => r1(b) < s.max);
   return {bmi:b, step, cat:BMI_STEPS[step].name};
 }
 
@@ -538,6 +541,15 @@ function parseDate(v){
   const hasTime = d.getHours() || d.getMinutes() || d.getSeconds();
   return {text:`${d.getFullYear()}.${p2(d.getMonth() + 1)}.${p2(d.getDate())}`, ts:d.getTime(), time:hasTime ? `${p2(d.getHours())}:${p2(d.getMinutes())}` : ''};
 }
+// 생년월일 → 조사일 기준 만 나이
+function ageFrom(v, ts){
+  if (v == null || v === '') return null;
+  const b = parseDate(v); if (!b.ts) return null;
+  const bd = new Date(b.ts), at = ts ? new Date(ts) : new Date();
+  let a = at.getFullYear() - bd.getFullYear();
+  if (at.getMonth() < bd.getMonth() || (at.getMonth() === bd.getMonth() && at.getDate() < bd.getDate())) a--;
+  return a >= 1 && a <= 120 ? a : null;
+}
 function cleanId(v){
   if (v == null) return null;
   const s = typeof v === 'number' ? String(Math.round(v)) : String(v).trim();
@@ -598,6 +610,8 @@ function autoMap(f){
   pick('initials', h => /이니셜/.test(h));
   pick('name',     h => /성함|성명|이름/.test(h) && !/이니셜|영문/.test(h));
   pick('sex',      h => /성별/.test(h));
+  pick('age',      h => /나이|연령/.test(h) && !/생년|출생|시작|진단|처음/.test(h));
+  pick('birth',    h => /생년월일|출생/.test(h));
   pick('hw',       (h, raw) => WEIGHT_WORD(h) && HEIGHT_WORD(raw) && !WEIGHT_EXCL(h));
   pick('weight',   (h, raw) => WEIGHT_WORD(h) && !WEIGHT_EXCL(h) && !HEIGHT_WORD(raw));
   pick('height',   (h, raw) => HEIGHT_WORD(raw) && !WEIGHT_WORD(h));
@@ -620,6 +634,7 @@ function fileRecords(f){
     const dt = parseDate(g('time'));
     const rec = {file:f.name, fileIdx:f.idx, row:r + 1, id:idRaw, name:strOrNull(g('name')), initials:strOrNull(g('initials')),
       date:dt.text, ts:dt.ts, time:dt.time, sex:parseSex(g('sex')), height:num(g('height'), 100, 230), weight:num(g('weight'), 25, 250),
+      age:num(g('age'), 1, 120) ?? ageFrom(g('birth'), dt.ts),
       ans:{}, raw:{}, isExample:!!f.isExample, fromNQ:f.isNQ};
     if (m.hw != null){ const [w, h] = parseHW(row[m.hw]); if (rec.weight == null) rec.weight = w; if (rec.height == null) rec.height = h; }
     if (f.isNQ){
@@ -664,7 +679,7 @@ function rebuild(){
     if (!prev){ byKey.set(key, {...rec, key, dups:0}); return; }
     prev.dups++;
     if (rec.ts >= prev.ts){ // 같은 사람이 두 번 낸 경우: 나중 응답을 쓴다
-      ['date','ts','time','sex','height','weight','name','initials','row','file','fileIdx'].forEach(k => { if (rec[k] != null && rec[k] !== '') prev[k] = rec[k]; });
+      ['date','ts','time','sex','age','height','weight','name','initials','row','file','fileIdx'].forEach(k => { if (rec[k] != null && rec[k] !== '') prev[k] = rec[k]; });
       prev.ans = rec.ans; prev.raw = rec.raw;
     }
   }));
@@ -764,7 +779,9 @@ function adviceHead(p, d){
   const its = ITEMS.filter(it => it.d === d);
   let flagged = its.filter(it => isFlagged(it, p.ans[it.q]));
   if (!flagged.length){ const mn = Math.min(...its.map(it => p.s.item[it.q])); flagged = mn < 100 ? its.filter(it => p.s.item[it.q] === mn) : []; }
-  return flagged.length ? `<q>${esc(flagged.map(it => it.label).join(', '))}</q> 항목을 개선하세요!` : '아래의 내용을 꾸준히 실천해 보세요!';
+  if (!flagged.length) return '아래의 내용을 꾸준히 실천해 보세요!';
+  // 식약처 결과지: 균형은 "'…' 섭취를 늘리세요!", 절제·실천은 "'…' 항목을 개선하세요!"
+  return `<q>${esc(flagged.map(it => it.label).join(', '))}</q> ${d === 'B' ? '섭취를 늘리세요!' : '항목을 개선하세요!'}`;
 }
 function mustHTML(d){
   const m = MUST[d];
@@ -774,10 +791,11 @@ function reportHTML(p){
   const s = p.s, g = p.g, G = GRADE[g.T];
   const bi = bmiInfo(p.height, p.weight);
   const gen = [
+    `<span><b>나이</b> : ${p.age != null ? `만 ${fmtNum(p.age)}세` : '-'}</span>`,
     `<span><b>성별</b> : ${esc(p.sex || '-')}</span>`,
     `<span><b>키</b> : ${p.height ? fmtNum(p.height) + 'cm' : '-'}</span>`,
     `<span><b>체중</b> : ${p.weight ? fmtNum(p.weight) + 'kg' : '-'}</span>`,
-    `<span><b>비만도</b> : ${bi ? `${bi.cat}<em>(BMI ${bi.bmi.toFixed(1)})</em>` : '-'}</span>`,
+    `<span><b>비만도</b> : ${bi ? bi.cat : '-'}</span>`,
   ].join('');
   const page1 = `<section class="sheet p1">
     ${topHTML(p, 1)}
@@ -794,7 +812,7 @@ function reportHTML(p){
       ${['B', 'M', 'P'].map(d => barHTML(DOMAINS[d].name, s[d], DOMAINS[d].cut)).join('')}
     </div>
   </section>`;
-  const tail = g.T === '상' ? '지금처럼 좋은 식생활을 꾸준히 유지해 보세요!' : '각 영역별 점수가 모두 높아질 수 있도록 식품안전나라 영양지수 “자료실”에서 동영상을 시청하세요!';
+  const tail = g.T === '상' ? '지금처럼 좋은 식생활을 꾸준히 유지해 보세요!' : '각 영역별 점수가 모두 높아질 수 있도록 “자료실”에서 동영상을 시청하세요!';
   const page2 = `<section class="sheet">
     ${topHTML(p, 2)}
     <div class="p-card">${head('영역별 점수 패턴')}
@@ -804,10 +822,10 @@ function reportHTML(p){
     </div>
     <div class="p-card">${head('영역별 판정 결과 및 권고사항')}
       <table class="p-table"><thead><tr><th>영역</th><th>판정결과</th><th colspan="2">영역별 권고 사항</th></tr></thead><tbody>
-      ${['B', 'M', 'P'].map(d => `<tr><td class="td-dom">${DOMAINS[d].name}</td><td class="td-judge"><span class="v-${GRADE[g[d]].cls}">${GRADE[g[d]].word}</span><br>(${f1(s[d])})</td><td class="td-adv"><p class="head">${adviceHead(p, d)}</p><ul>${ADVICE[d].map(t => `<li>${esc(t)}</li>`).join('')}</ul></td><td class="td-must">${mustHTML(d)}</td></tr>`).join('')}
+      ${['B', 'M', 'P'].map(d => `<tr><td class="td-dom">${DOMAINS[d].name}</td><td class="td-judge"><span class="v-${GRADE[g[d]].cls}">${GRADE[g[d]].word}</span><br>(${f1(s[d])})</td><td class="td-adv"><p class="head">${adviceHead(p, d)}</p><ul>${ADVICE[d][g[d]].map(t => `<li>${esc(t)}</li>`).join('')}</ul></td><td class="td-must">${mustHTML(d)}</td></tr>`).join('')}
       </tbody></table>
     </div>
-    <div class="s-src">식품의약품안전처·한국영양학회 성인 영양지수(NQ-2021) 산출 기준 · 비만도: 대한비만학회 비만 진료지침(2022)</div>
+    <div class="s-src">식품의약품안전처·한국영양학회 성인 영양지수(NQ-2021) 산출 기준 · 비만도: 체질량지수(BMI) 기준</div>
   </section>`;
   return page1 + page2;
 }
@@ -819,6 +837,7 @@ function linkFor(p){
   const q = new URLSearchParams();
   q.set('r', ITEMS.map(it => p.ans[it.q]).join(''));
   if (p.sex === '남' || p.sex === '여') q.set('s', p.sex === '남' ? 'm' : 'f');
+  if (p.age != null) q.set('a', fmtNum(p.age));
   if (p.height) q.set('h', fmtNum(p.height));
   if (p.weight) q.set('w', fmtNum(p.weight));
   if (p.id) q.set('id', p.id);
@@ -833,7 +852,7 @@ function personFromHash(){
   const d = q.get('d') || '';
   const p = {key:'link', id:q.get('id') || null, name:null, initials:null,
     sex:q.get('s') === 'm' ? '남' : q.get('s') === 'f' ? '여' : null,
-    height:num(q.get('h'), 100, 230), weight:num(q.get('w'), 25, 250),
+    height:num(q.get('h'), 100, 230), weight:num(q.get('w'), 25, 250), age:num(q.get('a'), 1, 120),
     date:/^\d{8}$/.test(d) ? `${d.slice(0, 4)}.${d.slice(4, 6)}.${d.slice(6)}` : '', ans:{}, raw:{}};
   ITEMS.forEach((it, i) => { const c = +r[i]; p.raw[it.q] = r[i]; if (c >= 1 && c <= it.opts.length) p.ans[it.q] = c; });
   scorePerson(p);
@@ -893,7 +912,7 @@ function renderPeople(){
   $('#printSel').disabled = state.selected.size === 0;
   $('#exportXlsx').disabled = !P.some(p => p.ok);
 }
-const FIELD_LABELS = [['id','연구일련번호'],['name','성함'],['sex','성별'],['height','키'],['weight','체중'],['hw','키·체중(한 칸)'],['time','조사일(타임스탬프)'],['initials','이니셜']];
+const FIELD_LABELS = [['id','연구일련번호'],['name','성함'],['age','나이'],['birth','생년월일'],['sex','성별'],['height','키'],['weight','체중'],['hw','키·체중(한 칸)'],['time','조사일(타임스탬프)'],['initials','이니셜']];
 function colName(i){ let s = ''; i++; while (i){ const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
 function renderMap(){
   const real = state.files.filter(f => !f.isExample);
@@ -950,10 +969,10 @@ function printPeople(list){
 }
 function exportScores(){
   if (typeof XLSX === 'undefined'){ showMsg('bad', '엑셀 저장 도구를 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.'); return; }
-  const head = ['연구일련번호','성함','조사일','성별','키(cm)','체중(kg)','BMI','비만도', ...ITEMS.map(it => `Q${it.q} 응답코드`), ...ITEMS.map(it => `Q${it.q} 점수`), '균형','균형 판정','절제','절제 판정','실천','실천 판정','영양지수','종합 판정'];
+  const head = ['연구일련번호','성함','조사일','나이(만)','성별','키(cm)','체중(kg)','BMI','비만도', ...ITEMS.map(it => `Q${it.q} 응답코드`), ...ITEMS.map(it => `Q${it.q} 점수`), '균형','균형 판정','절제','절제 판정','실천','실천 판정','영양지수','종합 판정'];
   const rows = state.people.filter(p => p.ok).map(p => {
     const bi = bmiInfo(p.height, p.weight);
-    return [p.id || '', p.name || '', p.date, p.sex || '', p.height ?? '', p.weight ?? '', bi ? r1(bi.bmi) : '', bi ? bi.cat : '',
+    return [p.id || '', p.name || '', p.date, p.age ?? '', p.sex || '', p.height ?? '', p.weight ?? '', bi ? r1(bi.bmi) : '', bi ? bi.cat : '',
       ...ITEMS.map(it => p.ans[it.q]), ...ITEMS.map(it => p.s.item[it.q]),
       r1(p.s.B), p.g.B, r1(p.s.M), p.g.M, r1(p.s.P), p.g.P, r1(p.s.T), p.g.T];
   });
@@ -1010,7 +1029,7 @@ function ingest(parsed){
 
 /* ---------- 예시 데이터 (구글폼 응답 엑셀과 같은 모양) ---------- */
 function exampleFile(){
-  const head = ['타임스탬프','연구일련번호','성별','키(cm)','체중(kg)',
+  const head = ['타임스탬프','연구일련번호','나이(만)','성별','키(cm)','체중(kg)',
     '1. 채소 반찬(김치 제외)을 매 끼니 몇 가지 드십니까?','2. 과일을 얼마나 자주 드십니까?','3. 우유나 유제품을 얼마나 자주 드십니까?',
     '4. 생선을 얼마나 자주 드십니까?','5. 콩이나 두부를 얼마나 자주 드십니까?','6. 견과류를 얼마나 자주 드십니까?',
     '7. 잡곡이나 전곡을 얼마나 자주 드십니까?','8. 기름진 빵이나 과자를 얼마나 자주 드십니까?','9. 패스트푸드(피자, 햄버거 등)를 얼마나 자주 드십니까?',
@@ -1018,11 +1037,11 @@ function exampleFile(){
     '13. 일주일에 아침식사를 몇 번 하십니까?','14. 과식이나 폭식을 얼마나 자주 하십니까?','15. 건강한 식생활을 위해 노력하십니까?',
     '16. 영양표시를 확인하십니까?','17. 식사 전에 손을 씻습니까?','18. 과음하는 횟수는 얼마나 됩니까?'];
   const ppl = [
-    ['2026. 10. 27 오전 10:12:31', '예시-01', '여성', 161, 54,     [2,2,3,3,4,4,3,5,5,4,4,4,5,3,4,4,3,3]],
-    ['2026. 10. 27 오전 10:20:05', '예시-02', '남성', 175.2, 72.4, [4,4,3,3,3,3,4,2,2,3,2,2,5,2,4,4,5,2]],
-    ['2026. 10. 27 오전 10:31:47', '예시-03', '여성', 158.4, 49.8, [3,3,2,2,2,2,2,3,2,3,3,2,4,3,3,2,4,2]],
+    ['2026. 10. 27 오전 10:12:31', '예시-01', 26, '여성', 161, 54,     [2,2,3,3,4,4,3,5,5,4,4,4,5,3,4,4,3,3]],
+    ['2026. 10. 27 오전 10:20:05', '예시-02', 34, '남성', 175.2, 72.4, [4,4,3,3,3,3,4,2,2,3,2,2,5,2,4,4,5,2]],
+    ['2026. 10. 27 오전 10:31:47', '예시-03', 45, '여성', 158.4, 49.8, [3,3,2,2,2,2,2,3,2,3,3,2,4,3,3,2,4,2]],
   ];
-  const rows = [head, ...ppl.map(([t, id, sx, h, w, codes]) => [t, id, sx, h, w, ...codes.map((c, i) => OPT[ITEMS[i].q][c - 1])])];
+  const rows = [head, ...ppl.map(([t, id, ag, sx, h, w, codes]) => [t, id, ag, sx, h, w, ...codes.map((c, i) => OPT[ITEMS[i].q][c - 1])])];
   const f = {name:'예시 데이터', rows, idx:++fileSeq, isExample:true};
   detectFile(f);
   return f;
