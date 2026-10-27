@@ -714,13 +714,14 @@ const head = t => `<h3 class="c-head"><i>${CHEV}</i>${t}</h3>`;
 const verdict = g => `<span class="v-${GRADE[g].cls}">${GRADE[g].word}(${g})</span>`;
 function topHTML(p, page){
   const S = state.settings, logo = logoSrc();
-  const right = page === 2 ? `${esc(p.name ? p.name + ' 님' : p.label)} · ${page} / 2` : `${page} / 2`;
+  // 연구일련번호는 결과지에 찍지 않는다 (사이트 목록·검색·점수표 엑셀에서만 씀)
+  const right = page === 2 && p.name ? `${esc(p.name)} 님 · ${page} / 2` : `${page} / 2`;
   return `<div class="s-top"><div class="s-org">${logo ? `<img src="${esc(logo)}" alt="">` : ''}<span><b>${esc(S.uni)}</b><i>|</i>${esc(S.lab)}</span></div><span>${right}</span></div>`;
 }
 function bandHTML(p){
   const S = state.settings, ch = charSrc();
   const who = [];
-  if (p.id) who.push(`연구일련번호 ${esc(p.id)}`); else if (!p.name && p.initials) who.push(`이니셜 ${esc(p.initials)}`);
+  if (!p.name && p.initials) who.push(`이니셜 ${esc(p.initials)}`);
   if (p.date) who.push(`조사일 ${esc(p.date)}`);
   if (p.isExample) who.push('예시 데이터');
   return `<div class="s-band">
@@ -843,7 +844,6 @@ function linkFor(p){
   if (p.age != null) q.set('a', fmtNum(p.age));
   if (p.height) q.set('h', fmtNum(p.height));
   if (p.weight) q.set('w', fmtNum(p.weight));
-  if (p.id) q.set('id', p.id);
   if (p.date) q.set('d', p.date.replace(/\./g, ''));
   return location.href.split('#')[0] + '#' + q.toString();
 }
@@ -866,7 +866,7 @@ function showViewer(){
   const p = personFromHash();
   document.body.classList.toggle('viewer', !!p);
   if (!p) return false;
-  $('#vwTitle').textContent = `영양지수 결과지${p.id ? ' · ' + p.id : ''}`;
+  $('#vwTitle').textContent = '영양지수 결과지';
   $('#vwPages').innerHTML = reportHTML(p);
   $('#vwPrint').onclick = () => printPeople([p]);
   fitPages();
